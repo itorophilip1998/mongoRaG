@@ -1,11 +1,11 @@
-import express from 'express';
-import mongoose from 'mongoose';
-import { OpenAI } from 'openai';
-import dotenv from 'dotenv';
-import { MemoryVectorStore } from 'langchain/vectorstores/memory';
-import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
-import { RetrievalQAChain } from 'langchain/chains';
-import { ChatOpenAI } from 'langchain/chat_models/openai';
+const express = require('express');
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+const { OpenAI } = require('openai');
+const { MemoryVectorStore } = require('langchain/vectorstores/memory');
+const { OpenAIEmbeddings } = require('langchain/embeddings/openai');
+const { RetrievalQAChain } = require('langchain/chains');
+const { ChatOpenAI } = require('langchain/chat_models/openai');
 
 dotenv.config();
 
