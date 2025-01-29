@@ -4,8 +4,10 @@ const dotenv = require('dotenv');
 const { OpenAI } = require('openai');
 const { MemoryVectorStore } = require('langchain/vectorstores/memory');
 const { OpenAIEmbeddings } = require('langchain/embeddings/openai');
-const { RetrievalQAChain } = require('langchain/chains');
+const { createRetrievalChain } = require('langchain/chains/retrieval');
 const { ChatOpenAI } = require('langchain/chat_models/openai');
+const { ChatPromptTemplate } = require('@langchain/core/prompts');
+const { createStuffDocumentsChain } = require('langchain/chains/combine_documents');
 
 dotenv.config();
 
@@ -51,14 +53,16 @@ app.post('/search', async (req, res) => {
         // Retrieve relevant documents using vector search
         const retriever = vectorStore.asRetriever();
         const retrievedDocs = await retriever.getRelevantDocuments(query);
-        const context = retrievedDocs.map(doc => `Model: ${doc.metadata.model}\nContent: ${doc.pageContent}`).join('\n');
 
-        // Use OpenAI for response generation
+        // Create a retrieval chain
         const chatModel = new ChatOpenAI({ openAIApiKey: process.env.OPENAI_API_KEY });
-        const chain = RetrievalQAChain.fromLLM(chatModel, retriever);
-        const response = await chain.call({ query });
+        const prompt = ChatPromptTemplate.fromTemplate("Given the following retrieved documents, answer the user's query:\n{context}\nQuery: {query}");
+        const documentChain = createStuffDocumentsChain({ llm: chatModel, prompt });
+        const chain = createRetrievalChain({ retriever, combineDocsChain: documentChain });
 
-        res.json({ answer: response.text, documents: retrievedDocs });
+        const response = await chain.invoke({ query });
+
+        res.json({ answer: response.output, documents: retrievedDocs });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal server error' });
