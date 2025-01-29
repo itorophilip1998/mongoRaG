@@ -2,12 +2,15 @@
   "name": "mongo_rag",
   "version": "1.0.0",
   "main": "index.js",
-  "license": "MIT", 
-
+  "license": "MIT",
   "scripts": {
     "dev": "yarn nodemon index.js"
   },
   "dependencies": {
+    "@langchain/community": "^0.3.27",
+    "@langchain/core": "^0.3.36",
+    "@langchain/openai": "^0.4.2",
+    "axios": "^1.7.9",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "langchain": "^0.3.14",
